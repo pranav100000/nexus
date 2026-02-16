@@ -27,6 +27,51 @@ export async function getChangedFiles(repoPath: string): Promise<string[]> {
   }
 }
 
+const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf899d15363d7aa82';
+
+export async function getGitDiffRange(repoPath: string, base: string, head = 'HEAD'): Promise<string> {
+  try {
+    const { stdout } = await exec('git', ['diff', `${base}...${head}`], { cwd: repoPath });
+    return stdout;
+  } catch {
+    // If three-dot fails (e.g. unrelated histories), try two-dot
+    const { stdout } = await exec('git', ['diff', `${base}..${head}`], { cwd: repoPath });
+    return stdout;
+  }
+}
+
+export async function getChangedFilesRange(repoPath: string, base: string, head = 'HEAD'): Promise<string[]> {
+  try {
+    const { stdout } = await exec('git', ['diff', '--name-only', `${base}...${head}`], { cwd: repoPath });
+    return stdout.split('\n').map((f) => f.trim()).filter(Boolean);
+  } catch {
+    const { stdout } = await exec('git', ['diff', '--name-only', `${base}..${head}`], { cwd: repoPath });
+    return stdout.split('\n').map((f) => f.trim()).filter(Boolean);
+  }
+}
+
+export async function getCommitDiff(repoPath: string, commit: string): Promise<string> {
+  try {
+    const { stdout } = await exec('git', ['diff', `${commit}~1..${commit}`], { cwd: repoPath });
+    return stdout;
+  } catch {
+    // No parent (initial commit) — diff against empty tree
+    const { stdout } = await exec('git', ['diff', `${EMPTY_TREE}..${commit}`], { cwd: repoPath });
+    return stdout;
+  }
+}
+
+export async function getCommitChangedFiles(repoPath: string, commit: string): Promise<string[]> {
+  try {
+    const { stdout } = await exec('git', ['diff', '--name-only', `${commit}~1..${commit}`], { cwd: repoPath });
+    return stdout.split('\n').map((f) => f.trim()).filter(Boolean);
+  } catch {
+    // No parent (initial commit) — diff against empty tree
+    const { stdout } = await exec('git', ['diff', '--name-only', `${EMPTY_TREE}..${commit}`], { cwd: repoPath });
+    return stdout.split('\n').map((f) => f.trim()).filter(Boolean);
+  }
+}
+
 export async function getCurrentBranch(repoPath: string): Promise<string> {
   try {
     const { stdout } = await exec('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoPath });

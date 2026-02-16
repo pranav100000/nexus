@@ -1,6 +1,6 @@
-import { anthropic } from '@ai-sdk/anthropic';
-import { openai } from '@ai-sdk/openai';
-import { google } from '@ai-sdk/google';
+import { anthropic, createAnthropic } from '@ai-sdk/anthropic';
+import { openai, createOpenAI } from '@ai-sdk/openai';
+import { google, createGoogleGenerativeAI } from '@ai-sdk/google';
 import { ConfigError } from '@nexus-agent/shared';
 import type { NexusConfig } from '@nexus-agent/shared';
 
@@ -11,26 +11,36 @@ export function createProvider(modelString: string, config: NexusConfig) {
 
   switch (providerName) {
     case 'anthropic':
-      return anthropic(modelId, { apiKey: providerConfig?.apiKey });
+      if (providerConfig?.apiKey) {
+        return createAnthropic({ apiKey: providerConfig.apiKey })(modelId);
+      }
+      return anthropic(modelId);
     case 'openai':
-      return openai(modelId, { apiKey: providerConfig?.apiKey });
+      if (providerConfig?.apiKey) {
+        return createOpenAI({ apiKey: providerConfig.apiKey })(modelId);
+      }
+      return openai(modelId);
     case 'google':
-      return google(modelId, { apiKey: providerConfig?.apiKey });
+      if (providerConfig?.apiKey) {
+        return createGoogleGenerativeAI({ apiKey: providerConfig.apiKey })(modelId);
+      }
+      return google(modelId);
     case 'ollama':
-      return openai(modelId, {
+      return createOpenAI({
         baseURL: providerConfig?.baseUrl ?? 'http://localhost:11434/v1',
-      });
+        apiKey: 'ollama',
+      })(modelId);
     case 'openrouter':
-      return openai(modelId, {
+      return createOpenAI({
         baseURL: 'https://openrouter.ai/api/v1',
         apiKey: providerConfig?.apiKey,
-      });
+      })(modelId);
     default:
       if (providerConfig?.baseUrl) {
-        return openai(modelId, {
+        return createOpenAI({
           baseURL: providerConfig.baseUrl,
           apiKey: providerConfig?.apiKey,
-        });
+        })(modelId);
       }
       throw new ConfigError(`Unknown provider: ${providerName}`);
   }

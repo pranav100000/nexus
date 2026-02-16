@@ -1,7 +1,15 @@
 import { readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import type { TaskContext, AgentManifest } from '@nexus-agent/shared';
-import { getGitDiff, getChangedFiles, getCurrentBranch } from './git.js';
+import {
+  getGitDiff,
+  getChangedFiles,
+  getGitDiffRange,
+  getChangedFilesRange,
+  getCommitDiff,
+  getCommitChangedFiles,
+  getCurrentBranch,
+} from './git.js';
 
 const EXTENSION_LANGUAGE_MAP: Record<string, string> = {
   '.ts': 'typescript',
@@ -36,9 +44,35 @@ export class ContextManager {
   async buildContext(taskContext: TaskContext): Promise<RepoContext> {
     const repoPath = taskContext.repoPath;
 
+    let diffPromise: Promise<string>;
+    let filesPromise: Promise<string[]>;
+
+    if (taskContext.commit) {
+      diffPromise = taskContext.gitDiff != null
+        ? Promise.resolve(taskContext.gitDiff)
+        : getCommitDiff(repoPath, taskContext.commit);
+      filesPromise = taskContext.changedFiles != null
+        ? Promise.resolve(taskContext.changedFiles)
+        : getCommitChangedFiles(repoPath, taskContext.commit);
+    } else if (taskContext.base) {
+      diffPromise = taskContext.gitDiff != null
+        ? Promise.resolve(taskContext.gitDiff)
+        : getGitDiffRange(repoPath, taskContext.base);
+      filesPromise = taskContext.changedFiles != null
+        ? Promise.resolve(taskContext.changedFiles)
+        : getChangedFilesRange(repoPath, taskContext.base);
+    } else {
+      diffPromise = taskContext.gitDiff != null
+        ? Promise.resolve(taskContext.gitDiff)
+        : getGitDiff(repoPath);
+      filesPromise = taskContext.changedFiles != null
+        ? Promise.resolve(taskContext.changedFiles)
+        : getChangedFiles(repoPath);
+    }
+
     const [gitDiff, changedFiles, branch] = await Promise.all([
-      taskContext.gitDiff ?? getGitDiff(repoPath),
-      taskContext.changedFiles ?? getChangedFiles(repoPath),
+      diffPromise,
+      filesPromise,
       taskContext.branch ?? getCurrentBranch(repoPath),
     ]);
 

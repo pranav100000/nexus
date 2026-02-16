@@ -41,7 +41,8 @@ export class DaemonLifecycle {
     const logHandle = await open(logPath, 'a');
 
     // Find the daemon entry point
-    const daemonEntry = join(fileURLToPath(import.meta.url), '..', '..', '..', '..', 'daemon', 'dist', 'index.js');
+    // From packages/cli/dist/<file>.js → go up to packages/, then into daemon/dist/
+    const daemonEntry = join(fileURLToPath(import.meta.url), '..', '..', '..', 'daemon', 'dist', 'index.js');
 
     const child = spawn('node', [daemonEntry], {
       detached: true,

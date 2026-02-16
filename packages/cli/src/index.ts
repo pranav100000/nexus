@@ -28,6 +28,8 @@ export function createProgram(): Command {
     .option('-a, --agents <agents>', 'Comma-separated list of agents to use')
     .option('-f, --format <format>', 'Output format: terminal or json', 'terminal')
     .option('--pr <url>', 'Pull request URL')
+    .option('--base <ref>', 'Compare HEAD against a base ref (e.g. main, HEAD~5)')
+    .option('--commit <ref>', 'Review a specific commit (e.g. HEAD, abc1234)')
     .option('--max-cost <amount>', 'Maximum cost in dollars')
     .option('--timeout <seconds>', 'Timeout in seconds')
     .action(runCommand);

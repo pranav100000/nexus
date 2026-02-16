@@ -12,6 +12,8 @@ export interface TaskContext {
   changedFiles?: string[];
   branch?: string;
   languages?: string[];
+  base?: string;
+  commit?: string;
 }
 
 export interface TaskInput {

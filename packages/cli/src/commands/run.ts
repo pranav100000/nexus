@@ -13,6 +13,8 @@ export interface RunOptions {
   pr?: string;
   maxCost?: string;
   timeout?: string;
+  base?: string;
+  commit?: string;
 }
 
 export async function runCommand(action: string, description: string | undefined, options: RunOptions): Promise<void> {
@@ -30,6 +32,8 @@ export async function runCommand(action: string, description: string | undefined
     description,
     context: {
       repoPath,
+      base: options.base,
+      commit: options.commit,
     },
     agents: options.agents ? options.agents.split(',').map((a) => a.trim()) : undefined,
     constraints: {
