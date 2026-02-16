@@ -7,8 +7,6 @@ import chalk from 'chalk';
 import { NEXUS_DIR, AGENTS_DIR, CONFIG_FILE, DEFAULTS } from '@nexus-agent/shared';
 import type { NexusConfig } from '@nexus-agent/shared';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 export async function initCommand(): Promise<void> {
   const nexusDir = join(homedir(), NEXUS_DIR);
   const agentsDir = join(nexusDir, AGENTS_DIR);
@@ -17,8 +15,10 @@ export async function initCommand(): Promise<void> {
   await mkdir(agentsDir, { recursive: true });
   console.log(chalk.green(`Created ${nexusDir}`));
 
-  // Copy bundled agents
-  const templatesDir = join(__dirname, '..', '..', 'templates', 'agents');
+  // Copy bundled agents — resolve from package root (dist/../templates)
+  // We walk up from the CLI package's node_modules resolution to find the package root
+  const cliPkgDir = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const templatesDir = join(cliPkgDir, 'templates', 'agents');
   if (existsSync(templatesDir)) {
     const agents = await readdir(templatesDir);
     for (const agent of agents) {
