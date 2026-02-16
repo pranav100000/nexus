@@ -1,0 +1,10 @@
+{
+  "name": "security-reviewer",
+  "version": "0.1.0",
+  "description": "Identifies security vulnerabilities, auth issues, and injection risks",
+  "capabilities": ["security-review", "vulnerability-detection", "auth-audit"],
+  "languages": ["typescript", "javascript", "python", "go", "rust"],
+  "tools": [],
+  "model": "anthropic/claude-sonnet-4-5-20250929",
+  "maxContextTokens": 100000
+}

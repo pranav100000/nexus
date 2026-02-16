@@ -1,0 +1,10 @@
+{
+  "name": "perf-analyzer",
+  "version": "0.1.0",
+  "description": "Identifies performance bottlenecks, N+1 queries, and optimization opportunities",
+  "capabilities": ["performance-review", "complexity-analysis", "query-optimization"],
+  "languages": ["typescript", "javascript", "python", "go"],
+  "tools": [],
+  "model": "anthropic/claude-sonnet-4-5-20250929",
+  "maxContextTokens": 100000
+}

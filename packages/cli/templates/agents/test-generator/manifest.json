@@ -1,0 +1,10 @@
+{
+  "name": "test-generator",
+  "version": "0.1.0",
+  "description": "Generates comprehensive test cases with edge case coverage",
+  "capabilities": ["test-generation", "coverage-analysis", "edge-case-detection"],
+  "languages": ["typescript", "javascript", "python"],
+  "tools": [],
+  "model": "anthropic/claude-sonnet-4-5-20250929",
+  "maxContextTokens": 100000
+}

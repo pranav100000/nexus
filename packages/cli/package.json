@@ -1,0 +1,28 @@
+{
+  "name": "@nexus-agent/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "nexus": "./dist/bin/nexus.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx watch src/bin/nexus.ts",
+    "clean": "rm -rf dist",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nexus-agent/shared": "workspace:*",
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
