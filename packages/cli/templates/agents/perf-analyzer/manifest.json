@@ -5,6 +5,30 @@
   "capabilities": ["performance-review", "complexity-analysis", "query-optimization"],
   "languages": ["typescript", "javascript", "python", "go"],
   "tools": [],
-  "model": "anthropic/claude-sonnet-4-5-20250929",
-  "maxContextTokens": 100000
+  "model": "",
+  "maxContextTokens": 100000,
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" },
+      "findings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "severity": { "type": "string", "enum": ["critical", "warning", "info"] },
+            "file": { "type": "string" },
+            "line": { "type": "number" },
+            "message": { "type": "string" },
+            "suggestion": { "type": "string" }
+          },
+          "required": ["severity", "message"]
+        },
+        "maxItems": 10
+      },
+      "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+      "approve": { "type": "boolean" }
+    },
+    "required": ["summary", "findings", "confidence", "approve"]
+  }
 }

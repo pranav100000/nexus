@@ -39,10 +39,7 @@ export type Finding = z.infer<typeof FindingSchema>;
 
 export interface SubtaskResult {
   agentName: string;
-  summary: string;
-  findings: Finding[];
-  confidence: number;
-  approve: boolean;
+  output: Record<string, unknown>;
   tokenUsage: { input: number; output: number };
   cost: number;
   durationMs: number;
@@ -57,11 +54,10 @@ export interface Subtask {
 
 export interface TaskResult {
   summary: string;
-  findings: Finding[];
-  approve: boolean;
   totalCost: number;
   totalDurationMs: number;
   agentResults: SubtaskResult[];
+  agentOutputs: Record<string, Record<string, unknown>>;
 }
 
 export interface TaskState {

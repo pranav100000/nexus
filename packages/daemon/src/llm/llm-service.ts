@@ -1,8 +1,8 @@
-import { generateText, generateObject } from 'ai';
+import { generateText, generateObject, jsonSchema } from 'ai';
 import { LLMError } from '@nexus-agent/shared';
 import type { NexusConfig } from '@nexus-agent/shared';
 import { createProvider } from './provider-factory.js';
-import type { ChatRequest, ChatResponse, LLMService, StructuredRequest } from './types.js';
+import type { ChatRequest, ChatResponse, JsonSchemaRequest, LLMService, StructuredRequest } from './types.js';
 
 const MODEL_PRICING: Record<string, { input: number; output: number }> = {
   'claude-sonnet-4-5-20250929': { input: 3, output: 15 },
@@ -57,6 +57,28 @@ export class LLMServiceImpl implements LLMService {
       });
 
       return object;
+    } catch (error) {
+      throw new LLMError(
+        error instanceof Error ? error.message : String(error),
+        request.model.split('/')[0],
+        request.model,
+      );
+    }
+  }
+
+  async structuredJson(request: JsonSchemaRequest): Promise<Record<string, unknown>> {
+    const provider = createProvider(request.model, this.config);
+
+    try {
+      const { object } = await generateObject({
+        model: provider,
+        system: request.system,
+        prompt: request.prompt,
+        schema: jsonSchema(request.schema),
+        maxTokens: request.maxTokens,
+      });
+
+      return object as Record<string, unknown>;
     } catch (error) {
       throw new LLMError(
         error instanceof Error ? error.message : String(error),

@@ -13,7 +13,7 @@ export class ParallelStrategy implements ExecutionStrategy {
 
       try {
         const result = await runner.run(agent, subtask, context);
-        onProgress(agent.manifest.name, 'completed', `${agent.manifest.name} completed with ${result.findings.length} findings`);
+        onProgress(agent.manifest.name, 'completed', `${agent.manifest.name} completed`);
         return result;
       } catch (error) {
         onProgress(agent.manifest.name, 'failed', `${agent.manifest.name} failed: ${(error as Error).message}`);

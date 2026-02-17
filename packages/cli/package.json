@@ -41,6 +41,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@nexus-agent/daemon": "workspace:*",
     "@nexus-agent/shared": "workspace:*",
     "chalk": "^5.4.0",
     "commander": "^13.0.0"

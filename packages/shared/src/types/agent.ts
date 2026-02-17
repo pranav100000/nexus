@@ -9,6 +9,7 @@ export interface AgentManifest {
   tools: string[];
   model: string;
   maxContextTokens: number;
+  outputSchema?: Record<string, unknown>;
 }
 
 export interface AgentInfo {
@@ -19,7 +20,7 @@ export interface AgentInfo {
   model: string;
 }
 
-export const AgentOutputSchema = z.object({
+export const ReviewOutputSchema = z.object({
   summary: z.string(),
   findings: z.array(z.object({
     severity: z.enum(['critical', 'warning', 'info']),
@@ -32,4 +33,50 @@ export const AgentOutputSchema = z.object({
   approve: z.boolean(),
 });
 
-export type AgentOutput = z.infer<typeof AgentOutputSchema>;
+export type ReviewOutput = z.infer<typeof ReviewOutputSchema>;
+
+/** @deprecated Use ReviewOutputSchema instead */
+export const AgentOutputSchema = ReviewOutputSchema;
+/** @deprecated Use ReviewOutput instead */
+export type AgentOutput = ReviewOutput;
+
+export const DEFAULT_OUTPUT_SCHEMA: Record<string, unknown> = {
+  type: 'object',
+  properties: {
+    summary: { type: 'string' },
+    data: {},
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+  },
+  required: ['summary'],
+};
+
+export const REVIEW_OUTPUT_SCHEMA: Record<string, unknown> = {
+  type: 'object',
+  properties: {
+    summary: { type: 'string' },
+    findings: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          severity: { type: 'string', enum: ['critical', 'warning', 'info'] },
+          file: { type: 'string' },
+          line: { type: 'number' },
+          message: { type: 'string' },
+          suggestion: { type: 'string' },
+        },
+        required: ['severity', 'message'],
+      },
+      maxItems: 10,
+    },
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    approve: { type: 'boolean' },
+  },
+  required: ['summary', 'findings', 'confidence', 'approve'],
+};
+
+export function isReviewOutput(output: unknown): output is ReviewOutput {
+  if (typeof output !== 'object' || output === null) return false;
+  const obj = output as Record<string, unknown>;
+  return Array.isArray(obj.findings) && typeof obj.approve === 'boolean';
+}

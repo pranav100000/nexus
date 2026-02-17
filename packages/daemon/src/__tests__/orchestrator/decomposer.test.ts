@@ -108,7 +108,7 @@ describe('ManualDecomposer', () => {
     expect(subtasks[0].description).toContain('review');
     expect(subtasks[0].description).toContain('agent-a');
     expect(subtasks[0].description).toContain('HEAD');
-    expect(subtasks[0].description).toContain('Focus ONLY');
+    expect(subtasks[0].description).toContain('Analyze the provided context');
   });
 
   it('includes base context in generated description', () => {
@@ -122,6 +122,6 @@ describe('ManualDecomposer', () => {
     expect(subtasks[0].description).toContain('review');
     expect(subtasks[0].description).toContain('agent-a');
     expect(subtasks[0].description).toContain('main');
-    expect(subtasks[0].description).toContain('Focus ONLY');
+    expect(subtasks[0].description).toContain('Analyze the provided context');
   });
 });

@@ -3,8 +3,8 @@ import { existsSync } from 'node:fs';
 import { mkdir, writeFile, open } from 'node:fs/promises';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
-import { NEXUS_DIR, LOG_FILE, DEFAULTS, DaemonStartError } from '@nexus-agent/shared';
+import { createRequire } from 'node:module';
+import { NEXUS_DIR, LOG_FILE, DaemonStartError } from '@nexus-agent/shared';
 import { DaemonClient } from './daemon-client.js';
 
 const HEALTH_POLL_INTERVAL = 300;
@@ -40,9 +40,10 @@ export class DaemonLifecycle {
     const logPath = join(nexusDir, LOG_FILE);
     const logHandle = await open(logPath, 'a');
 
-    // Find the daemon entry point
-    // From packages/cli/dist/<file>.js → go up to packages/, then into daemon/dist/
-    const daemonEntry = join(fileURLToPath(import.meta.url), '..', '..', '..', 'daemon', 'dist', 'index.js');
+    // Resolve the daemon entry point via Node module resolution
+    // Works in both monorepo (workspace:*) and global npm installs
+    const require = createRequire(import.meta.url);
+    const daemonEntry = require.resolve('@nexus-agent/daemon');
 
     const child = spawn('node', [daemonEntry], {
       detached: true,

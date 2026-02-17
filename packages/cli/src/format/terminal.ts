@@ -1,5 +1,6 @@
 import chalk from 'chalk';
-import type { TaskResult, TaskEvent, Finding, AgentInfo } from '@nexus-agent/shared';
+import { isReviewOutput } from '@nexus-agent/shared';
+import type { TaskResult, TaskEvent, Finding, AgentInfo, ReviewOutput } from '@nexus-agent/shared';
 
 const SEVERITY_COLORS = {
   critical: chalk.red.bold,
@@ -29,30 +30,51 @@ export function formatFinding(finding: Finding): string {
   return output;
 }
 
+function formatReviewOutput(agentName: string, output: ReviewOutput): string[] {
+  const lines: string[] = [];
+
+  const statusIcon = output.approve ? chalk.green('\u2714') : chalk.red('\u2718');
+  lines.push(`${statusIcon} ${chalk.bold(agentName)}: ${output.approve ? 'APPROVED' : 'CHANGES REQUESTED'}`);
+  lines.push(`  ${output.summary}`);
+
+  if (output.findings.length > 0) {
+    lines.push(`  ${chalk.bold(`Findings (${output.findings.length}):`)}`);
+    for (const finding of output.findings) {
+      lines.push('  ' + formatFinding(finding).split('\n').join('\n  '));
+    }
+  }
+
+  return lines;
+}
+
+function formatGenericOutput(agentName: string, output: Record<string, unknown>): string[] {
+  const lines: string[] = [];
+
+  lines.push(chalk.bold(agentName));
+  if (typeof output.summary === 'string') {
+    lines.push(`  ${output.summary}`);
+  }
+  lines.push(chalk.dim(JSON.stringify(output, null, 2).split('\n').map((l) => `  ${l}`).join('\n')));
+
+  return lines;
+}
+
 export function formatResult(result: TaskResult): string {
   const lines: string[] = [];
 
-  // Header
-  const statusIcon = result.approve ? chalk.green('\u2714') : chalk.red('\u2718');
-  lines.push(`\n${statusIcon} ${result.approve ? 'APPROVED' : 'CHANGES REQUESTED'}\n`);
-
-  // Summary
-  lines.push(chalk.bold('Summary:'));
+  lines.push(chalk.bold('\nSummary:'));
   lines.push(result.summary);
   lines.push('');
 
-  // Findings
-  if (result.findings.length > 0) {
-    lines.push(chalk.bold(`Findings (${result.findings.length}):`));
-    for (const finding of result.findings) {
-      lines.push(formatFinding(finding));
-      lines.push('');
+  for (const agentResult of result.agentResults) {
+    if (isReviewOutput(agentResult.output)) {
+      lines.push(...formatReviewOutput(agentResult.agentName, agentResult.output as ReviewOutput));
+    } else {
+      lines.push(...formatGenericOutput(agentResult.agentName, agentResult.output));
     }
-  } else {
-    lines.push(chalk.green('No findings.'));
+    lines.push('');
   }
 
-  // Stats
   lines.push(chalk.dim(`Cost: $${result.totalCost.toFixed(4)} | Duration: ${(result.totalDurationMs / 1000).toFixed(1)}s | Agents: ${result.agentResults.length}`));
 
   return lines.join('\n');

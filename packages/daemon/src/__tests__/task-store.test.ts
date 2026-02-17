@@ -49,10 +49,7 @@ describe('TaskStore', () => {
     const task = store.create(mockInput);
     store.addSubtaskResult(task.id, {
       agentName: 'test-agent',
-      summary: 'looks good',
-      findings: [],
-      confidence: 0.9,
-      approve: true,
+      output: { summary: 'looks good', findings: [], confidence: 0.9, approve: true },
       tokenUsage: { input: 100, output: 50 },
       cost: 0.001,
       durationMs: 500,
@@ -65,11 +62,10 @@ describe('TaskStore', () => {
     const task = store.create(mockInput);
     store.setResult(task.id, {
       summary: 'All good',
-      findings: [],
-      approve: true,
       totalCost: 0.01,
       totalDurationMs: 1000,
       agentResults: [],
+      agentOutputs: {},
     });
     const updated = store.get(task.id);
     expect(updated.status).toBe('completed');
@@ -112,11 +108,10 @@ describe('TaskStore', () => {
       taskId: task.id,
       result: {
         summary: 'done',
-        findings: [],
-        approve: true,
         totalCost: 0,
         totalDurationMs: 0,
         agentResults: [],
+        agentOutputs: {},
       },
       timestamp: new Date(),
     });

@@ -1,6 +1,6 @@
 # Nexus
 
-AI agent orchestrator for automated code review. Nexus runs specialized agents (security reviewer, performance analyzer, test generator) in parallel against your diffs, powered by OpenAI, Anthropic, or Google models.
+AI agent orchestrator for multi-agent analysis. Nexus runs specialized agents in parallel against your code, powered by OpenAI, Anthropic, or Google models. Each agent declares its own output schema, making Nexus extensible beyond code review. Bundled agents include security reviewer, performance analyzer, and test generator.
 
 ## Quickstart
 
@@ -59,6 +59,33 @@ Nexus — running 3 agents against 4 changed files...
 | `--commit <ref>`   | Review a specific commit                      |
 | `--max-cost <$>`   | Maximum cost in dollars                       |
 | `--timeout <sec>`  | Timeout in seconds                            |
+
+## Custom Agents
+
+Create custom agents by adding a directory to `~/.nexus/agents/` with a `manifest.json` and optional `system-prompt.md`. Each agent declares its output shape via `outputSchema` (JSON Schema):
+
+```json
+{
+  "name": "my-agent",
+  "version": "0.1.0",
+  "description": "My custom analysis agent",
+  "capabilities": ["custom-analysis"],
+  "languages": ["typescript"],
+  "tools": [],
+  "model": "anthropic/claude-sonnet-4-5-20250929",
+  "maxContextTokens": 100000,
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" },
+      "score": { "type": "number" }
+    },
+    "required": ["summary"]
+  }
+}
+```
+
+If `outputSchema` is omitted, a default schema with `summary`, `data`, and `confidence` fields is used.
 
 ## Architecture
 

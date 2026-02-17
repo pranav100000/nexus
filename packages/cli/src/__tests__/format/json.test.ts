@@ -6,16 +6,15 @@ describe('json formatters', () => {
   it('formatResultJson produces valid JSON', () => {
     const result: TaskResult = {
       summary: 'test',
-      findings: [],
-      approve: true,
       totalCost: 0.01,
       totalDurationMs: 500,
       agentResults: [],
+      agentOutputs: { 'test-agent': { summary: 'test', approve: true } },
     };
     const json = formatResultJson(result);
     const parsed = JSON.parse(json);
     expect(parsed.summary).toBe('test');
-    expect(parsed.approve).toBe(true);
+    expect(parsed.agentOutputs['test-agent'].approve).toBe(true);
   });
 
   it('formatEventJson produces valid JSON', () => {

@@ -29,15 +29,6 @@ export async function openclawInstallCommand(options: OpenclawInstallOptions): P
 }
 
 function resolveTargetDir(explicitPath: string | undefined): string {
-  if (explicitPath) {
-    return explicitPath;
-  }
-
-  const cwd = process.cwd();
-  const claudeDir = join(cwd, '.claude');
-  if (existsSync(claudeDir)) {
-    return claudeDir;
-  }
-
-  return cwd;
+  const base = explicitPath ?? process.cwd();
+  return join(base, '.claude');
 }

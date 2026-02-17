@@ -28,7 +28,9 @@ export async function initCommand(): Promise<void> {
         await cp(src, dest, { recursive: true });
         console.log(chalk.green(`  Installed agent: ${agent}`));
       } else {
-        console.log(chalk.dim(`  Agent already exists: ${agent}`));
+        // Always overwrite manifest.json to pick up schema updates
+        await cp(join(src, 'manifest.json'), join(dest, 'manifest.json'));
+        console.log(chalk.green(`  Updated agent manifest: ${agent}`));
       }
     }
   }

@@ -1,5 +1,5 @@
-import { AgentOutputSchema, DEFAULTS } from '@nexus-agent/shared';
-import type { AgentOutput, SubtaskResult, Subtask } from '@nexus-agent/shared';
+import { DEFAULT_OUTPUT_SCHEMA } from '@nexus-agent/shared';
+import type { SubtaskResult, Subtask } from '@nexus-agent/shared';
 import type { LLMService } from '../llm/index.js';
 import type { RepoContext } from '../context/index.js';
 import type { LoadedAgent } from './manifest-loader.js';
@@ -16,23 +16,21 @@ export class AgentRunner {
 
     const systemPrompt = this.buildSystemPrompt(agent, context);
     const userPrompt = this.buildUserPrompt(subtask, context);
+    const schema = agent.manifest.outputSchema ?? DEFAULT_OUTPUT_SCHEMA;
 
-    const output: AgentOutput = await this.llm.structured({
+    const output = await this.llm.structuredJson({
       model,
       system: systemPrompt,
       prompt: userPrompt,
-      schema: AgentOutputSchema,
+      schema,
     });
 
     const durationMs = Date.now() - startTime;
 
     return {
       agentName: agent.manifest.name,
-      summary: output.summary,
-      findings: output.findings.slice(0, DEFAULTS.maxFindingsPerAgent),
-      confidence: output.confidence,
-      approve: output.approve,
-      tokenUsage: { input: 0, output: 0 }, // AI SDK doesn't expose this via generateObject easily
+      output,
+      tokenUsage: { input: 0, output: 0 },
       cost: 0,
       durationMs,
     };
@@ -53,9 +51,8 @@ export class AgentRunner {
     parts.push(`Changed files: ${context.changedFiles.join(', ')}`);
 
     parts.push(`\n\n## Important Constraints`);
-    parts.push(`- Return at most ${DEFAULTS.maxFindingsPerAgent} findings. Prioritize by severity.`);
     parts.push(`- Only analyze the diff and changed files provided. Do NOT audit the entire codebase.`);
-    parts.push(`- If the changes look good and have no issues, set approve to true and return an empty findings array.`);
+    parts.push(`- Respond according to your output schema.`);
 
     return parts.join('\n');
   }

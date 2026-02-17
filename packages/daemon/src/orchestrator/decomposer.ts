@@ -35,7 +35,7 @@ export class ManualDecomposer implements TaskDecomposer {
       parts.push(`Comparing HEAD against base: ${input.context.base}.`);
     }
 
-    parts.push('Focus ONLY on the provided diff and changed files.');
+    parts.push('Analyze the provided context and respond according to your output schema.');
 
     return parts.join(' ');
   }

@@ -23,6 +23,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@nexus-agent/daemon':
+        specifier: workspace:*
+        version: link:../daemon
       '@nexus-agent/shared':
         specifier: workspace:*
         version: link:../shared

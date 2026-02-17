@@ -27,8 +27,17 @@ export interface StructuredRequest<T> {
   maxTokens?: number;
 }
 
+export interface JsonSchemaRequest {
+  model: string;
+  system: string;
+  prompt: string;
+  schema: Record<string, unknown>;
+  maxTokens?: number;
+}
+
 export interface LLMService {
   chat(request: ChatRequest): Promise<ChatResponse>;
   structured<T>(request: StructuredRequest<T>): Promise<T>;
+  structuredJson(request: JsonSchemaRequest): Promise<Record<string, unknown>>;
   estimateCost(inputTokens: number, outputTokens: number, model: string): number;
 }
