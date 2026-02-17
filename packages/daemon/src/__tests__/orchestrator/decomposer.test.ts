@@ -96,4 +96,32 @@ describe('ManualDecomposer', () => {
     const subtasks = decomposer.decompose(input, manager);
     expect(subtasks[0].id).not.toBe(subtasks[1].id);
   });
+
+  it('includes commit context in generated description', () => {
+    const manager = createMockAgentManager(['agent-a']);
+    const input: TaskInput = {
+      action: 'review',
+      context: { repoPath: '/tmp/test', commit: 'HEAD' },
+    };
+
+    const subtasks = decomposer.decompose(input, manager);
+    expect(subtasks[0].description).toContain('review');
+    expect(subtasks[0].description).toContain('agent-a');
+    expect(subtasks[0].description).toContain('HEAD');
+    expect(subtasks[0].description).toContain('Focus ONLY');
+  });
+
+  it('includes base context in generated description', () => {
+    const manager = createMockAgentManager(['agent-a']);
+    const input: TaskInput = {
+      action: 'review',
+      context: { repoPath: '/tmp/test', base: 'main' },
+    };
+
+    const subtasks = decomposer.decompose(input, manager);
+    expect(subtasks[0].description).toContain('review');
+    expect(subtasks[0].description).toContain('agent-a');
+    expect(subtasks[0].description).toContain('main');
+    expect(subtasks[0].description).toContain('Focus ONLY');
+  });
 });

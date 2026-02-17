@@ -1,4 +1,4 @@
-import { AgentOutputSchema } from '@nexus-agent/shared';
+import { AgentOutputSchema, DEFAULTS } from '@nexus-agent/shared';
 import type { AgentOutput, SubtaskResult, Subtask } from '@nexus-agent/shared';
 import type { LLMService } from '../llm/index.js';
 import type { RepoContext } from '../context/index.js';
@@ -29,7 +29,7 @@ export class AgentRunner {
     return {
       agentName: agent.manifest.name,
       summary: output.summary,
-      findings: output.findings,
+      findings: output.findings.slice(0, DEFAULTS.maxFindingsPerAgent),
       confidence: output.confidence,
       approve: output.approve,
       tokenUsage: { input: 0, output: 0 }, // AI SDK doesn't expose this via generateObject easily
@@ -51,6 +51,11 @@ export class AgentRunner {
     parts.push(`Branch: ${context.branch}`);
     parts.push(`Languages: ${context.languages.join(', ')}`);
     parts.push(`Changed files: ${context.changedFiles.join(', ')}`);
+
+    parts.push(`\n\n## Important Constraints`);
+    parts.push(`- Return at most ${DEFAULTS.maxFindingsPerAgent} findings. Prioritize by severity.`);
+    parts.push(`- Only analyze the diff and changed files provided. Do NOT audit the entire codebase.`);
+    parts.push(`- If the changes look good and have no issues, set approve to true and return an empty findings array.`);
 
     return parts.join('\n');
   }

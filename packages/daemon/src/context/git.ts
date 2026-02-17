@@ -29,7 +29,18 @@ export async function getChangedFiles(repoPath: string): Promise<string[]> {
 
 const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf899d15363d7aa82';
 
+export function validateGitRef(ref: string): void {
+  if (ref.startsWith('-')) {
+    throw new Error(`Invalid git ref: '${ref}' — refs must not start with '-'`);
+  }
+  if (/[\s\0]/.test(ref)) {
+    throw new Error(`Invalid git ref: '${ref}' — refs must not contain whitespace or null bytes`);
+  }
+}
+
 export async function getGitDiffRange(repoPath: string, base: string, head = 'HEAD'): Promise<string> {
+  validateGitRef(base);
+  validateGitRef(head);
   try {
     const { stdout } = await exec('git', ['diff', `${base}...${head}`], { cwd: repoPath });
     return stdout;
@@ -41,6 +52,8 @@ export async function getGitDiffRange(repoPath: string, base: string, head = 'HE
 }
 
 export async function getChangedFilesRange(repoPath: string, base: string, head = 'HEAD'): Promise<string[]> {
+  validateGitRef(base);
+  validateGitRef(head);
   try {
     const { stdout } = await exec('git', ['diff', '--name-only', `${base}...${head}`], { cwd: repoPath });
     return stdout.split('\n').map((f) => f.trim()).filter(Boolean);
@@ -51,6 +64,7 @@ export async function getChangedFilesRange(repoPath: string, base: string, head 
 }
 
 export async function getCommitDiff(repoPath: string, commit: string): Promise<string> {
+  validateGitRef(commit);
   try {
     const { stdout } = await exec('git', ['diff', `${commit}~1..${commit}`], { cwd: repoPath });
     return stdout;
@@ -62,6 +76,7 @@ export async function getCommitDiff(repoPath: string, commit: string): Promise<s
 }
 
 export async function getCommitChangedFiles(repoPath: string, commit: string): Promise<string[]> {
+  validateGitRef(commit);
   try {
     const { stdout } = await exec('git', ['diff', '--name-only', `${commit}~1..${commit}`], { cwd: repoPath });
     return stdout.split('\n').map((f) => f.trim()).filter(Boolean);

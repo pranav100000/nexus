@@ -1,6 +1,8 @@
 {
   "name": "@nexus-agent/shared",
   "version": "0.1.0",
+  "description": "Shared types, constants, and utilities for Nexus agent orchestrator",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -9,6 +11,23 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pranavsharan/nexus",
+    "directory": "packages/shared"
+  },
+  "keywords": [
+    "nexus",
+    "ai",
+    "code-review",
+    "agents"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",

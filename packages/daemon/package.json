@@ -1,9 +1,35 @@
 {
   "name": "@nexus-agent/daemon",
   "version": "0.1.0",
+  "description": "Daemon server for Nexus AI agent orchestrator — runs agents, manages tasks, serves results",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pranavsharan/nexus",
+    "directory": "packages/daemon"
+  },
+  "keywords": [
+    "nexus",
+    "ai",
+    "code-review",
+    "agents",
+    "daemon"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx watch src/index.ts",

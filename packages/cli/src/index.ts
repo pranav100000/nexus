@@ -5,6 +5,7 @@ import { statusCommand } from './commands/status.js';
 import { resultCommand } from './commands/result.js';
 import { watchCommand } from './commands/watch.js';
 import { agentsListCommand } from './commands/agents.js';
+import { openclawInstallCommand } from './commands/openclaw.js';
 
 export function createProgram(): Command {
   const program = new Command();
@@ -62,6 +63,16 @@ export function createProgram(): Command {
     .description('List installed agents')
     .option('-f, --format <format>', 'Output format: terminal or json', 'terminal')
     .action(agentsListCommand);
+
+  const openclawCmd = program
+    .command('openclaw')
+    .description('OpenClaw integration');
+
+  openclawCmd
+    .command('install')
+    .description('Install the Nexus skill for OpenClaw/Claude Code')
+    .option('-p, --path <dir>', 'Target workspace directory')
+    .action(openclawInstallCommand);
 
   return program;
 }

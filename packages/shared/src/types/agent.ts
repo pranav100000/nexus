@@ -27,7 +27,7 @@ export const AgentOutputSchema = z.object({
     line: z.number().optional(),
     message: z.string(),
     suggestion: z.string().optional(),
-  })),
+  })).max(10),
   confidence: z.number().min(0).max(1),
   approve: z.boolean(),
 });

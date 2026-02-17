@@ -19,8 +19,24 @@ export class ManualDecomposer implements TaskDecomposer {
     return agents.map((agent) => ({
       id: randomUUID(),
       agentName: agent.manifest.name,
-      description: input.description ?? `${input.action} — analyzed by ${agent.manifest.name}`,
+      description: input.description ?? this.buildDescription(input, agent.manifest.name),
       context: input.context,
     }));
+  }
+
+  private buildDescription(input: TaskInput, agentName: string): string {
+    const parts: string[] = [
+      `Perform "${input.action}" analysis as ${agentName}.`,
+    ];
+
+    if (input.context.commit) {
+      parts.push(`Reviewing commit: ${input.context.commit}.`);
+    } else if (input.context.base) {
+      parts.push(`Comparing HEAD against base: ${input.context.base}.`);
+    }
+
+    parts.push('Focus ONLY on the provided diff and changed files.');
+
+    return parts.join(' ');
   }
 }

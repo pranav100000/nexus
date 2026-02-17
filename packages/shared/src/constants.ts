@@ -13,4 +13,5 @@ export const DEFAULTS = {
   maxCost: 1.0,
   timeout: 300,
   maxAgents: 10,
+  maxFindingsPerAgent: 10,
 } as const;

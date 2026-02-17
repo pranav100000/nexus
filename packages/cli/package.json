@@ -1,12 +1,39 @@
 {
   "name": "@nexus-agent/cli",
   "version": "0.1.0",
+  "description": "CLI for Nexus AI agent orchestrator — run code review agents from the terminal",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "nexus": "./dist/bin/nexus.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pranavsharan/nexus",
+    "directory": "packages/cli"
+  },
+  "keywords": [
+    "nexus",
+    "ai",
+    "code-review",
+    "agents",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx watch src/bin/nexus.ts",
